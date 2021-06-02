@@ -1,0 +1,134 @@
+syntax="proto3";
+package v1;
+option go_package="./;v1";
+import "google/protobuf/timestamp.proto";
+// 使用annotation和swagger都要事先安装的，然后编译的时候要加上-I包含两个下载好的路径中
+// 由于网上版本都是用旧版本的，所以这里也只能是1.16的grpc-gataway，
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+/*
+    由于protoc由google官方收回去维护了，所以旧的--go_out=plugins=grpc:.的方式已经弃用了
+    现在protoc会分成两部分执行：
+    protoc --proto_path=xxx --go_out=xxx xxx.proto
+    protoc --proto_path=xxx --go-grpc_out=. xxx.proto
+    
+    第一个是生成proto文件中，message的结构体相关的，它们的get set update reset方法
+    第二个是生成protoc文件中，service相关的server和client的stub
+    对于grpc-gateway，还需要额外生成一个gw文件
+    --grpc-gateway_out=logtostderr=true:.
+    最后还有一个可选的，就是swagger，我暂时还不知道这是干嘛的，会生成一个json文件
+    --swagger_out=logtostderr=true:.
+
+    当然--proto_path是指定当前proto的目录的，可以省略的
+    protoc --proto_path=xxx --gou_out=xxx --go-grpc_out=xxx xxx.proto
+    protoc --proto_path=D:\GO\pkg\mod\github.com\grpc-ecosystem\grpc-gateway@v1.16.0\ --proto_path=D:\GO\pkg\mod\github.com\grpc-ecosystem\grpc-gateway@v1.16.0\third_party\googleapis  --proto_path=./ --go_out=./ --go-grpc_out=./ --grpc-gateway_out=logtostderr=true:. *.proto
+*/
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+    info: {
+        title: "ToDo Service";
+        version: "1.0";
+    };
+    schemes: HTTP;
+    consumes: "application/json";
+    produces: "application/json";
+    responses: {
+        key: "404";
+        value: {
+            description: "Returned when the resource does not exit.";
+            schema: {
+                json_schema: {
+                    type: STRING;
+                }
+            }
+        }
+    }
+};
+
+message ToDo{
+    int64 id=1;
+    string title=2;
+    string description=3;
+    google.protobuf.Timestamp reminder=4;
+}
+
+message CreateRequest {
+    string api=1;
+    ToDo toDo=2;
+}
+
+message CreateResponse {
+    string api=1;
+    int64 id=2;
+}
+
+message ReadRequest {
+    string api=1;
+    int64 id=2;
+}
+
+message ReadResponse {
+    string api=1;
+    ToDo toDo=2;
+}
+
+message UpdateRequest {
+    string api=1;
+    ToDo toDo=2;
+}
+
+message UpdateResponse {
+    string api=1;
+    int64 updated=2;
+}
+
+message DeleteRequest {
+    string api=1;
+    int64 id=2;
+}
+
+message DeleteResponse {
+    string api=1;
+    int64 deleted=2;
+}
+
+message ReadAllRequest {
+    string api=1;
+}
+
+message ReadAllResponse {
+    string api=1;
+    repeated ToDo toDos=2;
+}
+
+service ToDoService {
+    rpc Create(CreateRequest) returns (CreateResponse) {
+        option (google.api.http) = {
+            post: "/v1/todo"
+            body: "*"
+        };
+    };
+    rpc Read(ReadRequest) returns (ReadResponse) {
+        option (google.api.http) = {
+            get: "/v1/todo/{id}"
+        };
+    };
+    rpc Update(UpdateRequest) returns (UpdateResponse) {
+        option (google.api.http) = {
+            put: "/v1/todo/{toDo.id}"
+            body: "*"
+            additional_bindings {
+                patch: "/v1/todo/{toDo.id}"
+            }
+        };
+    };
+    rpc Delete(DeleteRequest) returns (DeleteResponse) {
+        option (google.api.http) = {
+            delete: "/v1/todo/{id}"
+        };
+    };
+    rpc ReadAll(ReadAllRequest) returns (ReadAllResponse) {
+        option (google.api.http) = {
+            get: "/v1/todo/all"
+        };
+    };
+}

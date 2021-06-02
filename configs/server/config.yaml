@@ -1,0 +1,9 @@
+server:
+  host: localhost:8000
+proxy:
+  host: localhost:8080
+mysql:
+  host: localhost:3306
+  user: golearner
+  password: 123456
+  db-schema: grpc 
