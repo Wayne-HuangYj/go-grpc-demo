@@ -30,7 +30,7 @@ func main() {
 	// 	log.Fatal("配置文件解析失败，请检查")
 	// }
 	// address := flag.String("server", fmt.Sprintf("http://%s", cfg.Server.Host), "HTTP网关URL，e.g. http://localhost:" + cfg.Server.Host)
-	address := flag.String("server", fmt.Sprintf("http://%s", "localhost:8080"), "HTTP网关URL，e.g. http://localhost:8080")
+	address := flag.String("server", fmt.Sprintf("http://%s", "localhost:8088"), "HTTP网关URL，e.g. http://localhost:8080")
 	flag.Parse()
 
 	t := time.Now().In(time.UTC)

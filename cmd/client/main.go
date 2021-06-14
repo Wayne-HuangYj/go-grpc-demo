@@ -37,7 +37,6 @@ func init() {
 }
 
 func main() {
-	fmt.Println(cfg)
 	address := flag.String("server", cfg.Server.Host, "gRPC server in format host:port")
 	flag.Parse()
 	conn, err := grpc.Dial(*address, grpc.WithInsecure())
@@ -46,10 +45,12 @@ func main() {
 	}
 	defer conn.Close()
 
+	// 生成client stub
 	c := v1.NewToDoServiceClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
-	defer cancel()
+	// 设置5秒ctx
+	ctx := context.Background()
 
+	// 生成时间戳
 	t := time.Now().In(time.UTC)
 	reminder, _ := ptypes.TimestampProto(t)
 	pfx := t.Format(time.RFC3339Nano)
@@ -62,7 +63,7 @@ func main() {
 			Reminder: reminder,
 		},
 	}
-
+	// 调用RPC方法
 	res1, err := c.Create(ctx, &req1)
 	if err != nil {
 		log.Fatal("创建失败:", err)
