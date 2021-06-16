@@ -6,6 +6,7 @@ import (
 	v1 "go-grpc/api/server/v1"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"log"
 	"fmt"
 	"time"
@@ -39,7 +40,11 @@ func init() {
 func main() {
 	address := flag.String("server", cfg.Server.Host, "gRPC server in format host:port")
 	flag.Parse()
-	conn, err := grpc.Dial(*address, grpc.WithInsecure())
+	creds, err := credentials.NewClientTLSFromFile("../../certs/server.pem", "go-grpc.test.com")
+	if err != nil {
+		log.Fatal("读取TLS文件失败啊", err)
+	}
+	conn, err := grpc.Dial(*address, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Fatal("服务器，连不上啊", err)
 	}

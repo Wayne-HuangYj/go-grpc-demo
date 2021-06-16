@@ -10,6 +10,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.4.0
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible // indirect
+	golang.org/x/net v0.0.0-20210316092652-d523dce5a7f4
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	google.golang.org/genproto v0.0.0-20210524171403-669157292da3
 	google.golang.org/grpc v1.38.0

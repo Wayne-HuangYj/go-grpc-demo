@@ -18,7 +18,7 @@ func GrpcHandlerFunc(grpcServer *grpc.Server, otherHandler http.Handler) http.Ha
 	// 这是一个兼容grpc请求和http请求的handler，可以根据请求类型判断，从而选择某个handler去完成这个请求
 	// 但是如果使用grpc Server的serveHTTP方法的话，要求必须要有TLS协议，也就是HTTPS，所以这里HTTP是不行的
 	return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
-		if r.ProtoMajor == 2 && len(r.Header) == 0 {
+		if r.ProtoMajor == 2 && (strings.Contains(r.Header.Get("Content-Type"), "application/grpc") || len(r.Header) == 0) {
 			log.Printf("RPC Request: %s %s from %s\n", r.Method, r.RequestURI, r.RemoteAddr)
 			grpcServer.ServeHTTP(w, r)
 		} else {
@@ -36,10 +36,9 @@ func SwaggerFileFunc(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+	// p是获取URL中的文件名
     p := strings.TrimPrefix(r.URL.Path, "/swagger/")
-    p = path.Join("../../api/server/v1", p)
-
-    log.Printf("Serving swagger-file: %s", p)
-
+	// 
+    p = path.Join(BaseDir, "../../api/server/v1", p)
     http.ServeFile(w, r, p)
 }

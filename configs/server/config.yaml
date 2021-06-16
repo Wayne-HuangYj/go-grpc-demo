@@ -1,9 +1,14 @@
 # 对于go的http来说，一个端口是可以复用做多件事情的，比如开启grpc的同时，用于gateway的监听，也可以开启swagger
 server:
   host: localhost:8000
-  proxy: localhost:8088
+  proxy: localhost:8080
+  tls:
+    enabled: true
+    certKeyPath: certs/server.key
+    certPemPath: certs/server.pem
+    commonName: go-grpc.test.com
 mysql:
   host: localhost:3306
   user: golearner
   password: 123456
-  db-schema: grpc 
+  dbSchema: grpc 
